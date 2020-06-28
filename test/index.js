@@ -1,11 +1,10 @@
-'use strict';
+import {execSync} from 'child_process';
+import {resolve} from 'path';
 
-const {execSync} = require ('child_process');
-const {resolve} = require ('path');
+import Z from 'sanctuary-type-classes';
 
-const Z = require ('sanctuary-type-classes');
-
-const doctest = require ('..');
+import doctest from '../lib/doctest.js';
+import require from '../lib/require.js';
 
 
 let gray  = '';
@@ -62,28 +61,31 @@ const testCommand = (command, expected) => {
 };
 
 const moduleTests = Promise.all ([
-  testModule ('test/shared/index.js', {silent: true}),
-  testModule ('test/shared/index.coffee', {silent: true}),
-  testModule ('test/line-endings/CR.js', {silent: true}),
-  testModule ('test/line-endings/CR.coffee', {silent: true}),
-  testModule ('test/line-endings/CR+LF.js', {silent: true}),
-  testModule ('test/line-endings/CR+LF.coffee', {silent: true}),
-  testModule ('test/line-endings/LF.js', {silent: true}),
-  testModule ('test/line-endings/LF.coffee', {silent: true}),
-  testModule ('test/exceptions/index.js', {silent: true}),
-  testModule ('test/statements/index.js', {silent: true}),
-  testModule ('test/fantasy-land/index.js', {silent: true}),
-  testModule ('test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true}),
-  testModule ('test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true}),
-  testModule ('test/amd/index.js', {module: 'amd', silent: true}),
-  testModule ('test/commonjs/require/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/exports/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/commonjs/strict/index.js', {module: 'commonjs', silent: true}),
-  testModule ('test/bin/executable', {type: 'js', silent: true}),
-  testModule ('test/es2015/index.js', {silent: true}),
-  testModule ('test/es2018/index.js', {silent: true}),
-]);
+  [testModule ('test/shared/index.js', {silent: true})],
+  [testModule ('test/shared/index.coffee', {silent: true})],
+  [testModule ('test/line-endings/CR.js', {silent: true})],
+  [testModule ('test/line-endings/CR.coffee', {silent: true})],
+  [testModule ('test/line-endings/CR+LF.js', {silent: true})],
+  [testModule ('test/line-endings/CR+LF.coffee', {silent: true})],
+  [testModule ('test/line-endings/LF.js', {silent: true})],
+  [testModule ('test/line-endings/LF.coffee', {silent: true})],
+  [testModule ('test/exceptions/index.js', {silent: true})],
+  [testModule ('test/statements/index.js', {silent: true})],
+  [testModule ('test/fantasy-land/index.js', {silent: true})],
+  [testModule ('test/transcribe/index.js', {prefix: '.', openingDelimiter: '```javascript', closingDelimiter: '```', silent: true})],
+  [testModule ('test/transcribe/index.coffee', {prefix: '.', openingDelimiter: '```coffee', closingDelimiter: '```', silent: true})],
+  [testModule ('test/amd/index.js', {module: 'amd', silent: true})],
+  [testModule ('test/commonjs/require/index.js', {module: 'commonjs', silent: true})],
+  [testModule ('test/commonjs/exports/index.js', {module: 'commonjs', silent: true})],
+  [testModule ('test/commonjs/module.exports/index.js', {module: 'commonjs', silent: true})],
+  [testModule ('test/commonjs/strict/index.js', {module: 'commonjs', silent: true})],
+  [testModule ('test/bin/executable', {type: 'js', silent: true})],
+  [testModule ('test/es2015/index.js', {silent: true})],
+  [testModule ('test/es2018/index.js', {silent: true})],
+  Number ((process.versions.node.split ('.'))[0]) >= 14
+  ? [testModule ('test/es2020/index.js', {silent: true})]
+  : [],
+].flat ());
 
 testCommand ('bin/doctest', {
   status: 1,
@@ -176,7 +178,7 @@ testCommand ('bin/doctest --type js test/bin/executable', {
   stderr: '',
 });
 
-testCommand ('bin/doctest --module commonjs lib/doctest.js', {
+testCommand ('bin/doctest --module esm lib/doctest.js', {
   status: 0,
   stdout: `running doctests in lib/doctest.js...
 ...
